@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "sourceMap": true
+  },
+  "files":[
+  ]
+}
