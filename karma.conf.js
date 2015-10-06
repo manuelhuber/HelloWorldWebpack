@@ -13,7 +13,7 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'target/*.js'
+            'Coverage/target/*.js'
         ],
 
         // list of files to exclude
@@ -22,7 +22,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'target/specbundle.js': ['sourcemap', 'coverage']
+            'Coverage/target/specbundle.js': ['sourcemap', 'coverage']
         },
 
         // test results reporter to use
@@ -31,7 +31,7 @@ module.exports = function (config) {
         reporters: ['progress', 'coverage'],
 
         coverageReporter: {
-            dir: 'karmaCoverage/',
+            dir: path.join(__dirname, 'Coverage', 'karmaCoverage'),
             reporters: [
                 { type: 'html', subdir: 'report-html' },
                 { type: 'json', subdir: 'report-json' },

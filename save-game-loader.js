@@ -27,7 +27,7 @@ module.exports = function (content, map) {
 
         }
     });
-    fs.writeFile(directory + "/" + fileName + ".map.log", map, function (err) {
+    fs.writeFile(directory + "/" + fileName + ".map.json", JSON.stringify(map), function (err) {
         if (err) {
             console.log(err);
 
@@ -35,11 +35,5 @@ module.exports = function (content, map) {
     });
 
     this.callback(null, content, map);
-
-}
-
-module.exports.pitch = function (remainingRequest, precedingRequest, data) {
-    //console.log("remaining Request: " + remainingRequest);
-    //console.log("preceding Request: " + precedingRequest);
 
 }

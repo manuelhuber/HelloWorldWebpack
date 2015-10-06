@@ -1,43 +1,48 @@
 var gulp = require('gulp');
 var del = require('del');
+var path = require('path');
 var webpack = require('webpack');
 var karma = require('karma');
 var remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
 var dirtyHack = require('./remapLcovHack.js');
 
-var karmaCoverageOut = __dirname + "\\karmaCoverage";
-var webpackOut = __dirname + "\\target";
-var remapIstanbulOut = "remapIstanbul\\remappedLcov.info";
-var dirtyHackOut = "remapIstanbul\\fixedLcov.info";
+var coverageKarmaOut = path.join(__dirname, 'Coverage', 'karmaCoverage');
+var coverageWebpackOut = path.join(__dirname, 'Coverage', 'target');
+var coverageRemapIstanbulOut = path.join(__dirname, 'Coverage', 'remapIstanbul', 'remappedLcov.info');
+var coverageDirtyHackMarker = "::delete::";
+var coverageDirtyHackOut = path.join(__dirname, 'Coverage', 'remapIstanbul', 'fixedLcov.info');
+var saveGameLoader = path.join(__dirname, "save-game-loader");
+var tsloader = ["source-map",saveGameLoader + "?save=afterTS", "ts-loader"].join('!');
 
-gulp.task('clean', function (callback) {
-    del([webpackOut, karmaCoverageOut, remapIstanbulOut, dirtyHackOut]);
+gulp.task('coverage-clean', function (callback) {
+    del(path.join(__dirname, 'Coverage'));
     callback();
 });
 
-gulp.task('coverage-webpack', ['clean'], function (callback) {
+gulp.task('coverage-webpack', ['coverage-clean'], function (callback) {
     webpack({
         resolve: {
             extensions: ['', '.ts', '.webpack.js', '.web.js', '.js']
         },
         debug: true,
-        devtool: 'source-map',
+        devtool: 'inline-source-map',
         entry: {
             spec: "./test/HelloWorldSpec"
         },
         output: {
-            path: webpackOut,
+            path: coverageWebpackOut,
             filename: "[name]bundle.js",
-            devtoolModuleFilenameTemplate: "::delete::[absolute-resource-path]",
+            devtoolModuleFilenameTemplate: coverageDirtyHackMarker+"[absolute-resource-path]"
         },
 
         module: {
             loaders: [
-                { test: /\.ts$/, loader: 'source-map-loader!ts-loader' }
+                { test: /\.ts$/, loader: tsloader }
             ]
         }
     }, function (err, stats) {
         if (err) throw new gutil.PluginError("webpack", err);
+
         callback();
     });
 
@@ -52,16 +57,16 @@ gulp.task('coverage-karma', ['coverage-webpack'], function (callback) {
 })
 
 gulp.task('coverage-remap-istanbul', ['coverage-karma'], function (callback) {
-    return gulp.src('karmaCoverage/report-json/coverage-final.json')
+    return gulp.src(path.join(coverageKarmaOut, "report-json", "coverage-final.json"))
         .pipe(remapIstanbul({
             reports: {
-                'lcovonly': remapIstanbulOut
+                'lcovonly': coverageRemapIstanbulOut
             }
         }));
 });
 
 gulp.task('coverage-lcov-hack', ['coverage-remap-istanbul'], function () {
-    dirtyHack.lcovHack(remapIstanbulOut, dirtyHackOut);
+    dirtyHack.lcovHack(coverageRemapIstanbulOut, coverageDirtyHackOut, coverageDirtyHackMarker);
 
 });
 

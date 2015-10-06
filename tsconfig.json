@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "inlineSourceMap": false,
+    "inlineSourceMap": true,
     "inlineSources": false,
-    "sourceMap": true
+    "sourceMap": false
   },
   "files":[
   ]
